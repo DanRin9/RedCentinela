@@ -85,8 +85,7 @@ def cooling_schedule(initial_temperature: float, cooling_rate: float, iteration:
 
     Esta función se invoca desde simulated_annealing en cada iteración.
     """
-    # TODO: Add your code here
-    raise NotImplementedError("Punto 2: implemente cooling_schedule")
+    return initial_temperature * cooling_rate ** iteration
 
 
 def simulated_annealing(
