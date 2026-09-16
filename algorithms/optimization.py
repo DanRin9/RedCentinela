@@ -15,8 +15,9 @@ def configuration_score(
     - Use problem.score_components(configuration); ya retorna cobertura,
       redundancia y exposición en ese orden.
     """
-    # TODO: Add your code here
-    raise NotImplementedError("Punto 1: implemente configuration_score")
+
+    cobertura, redundancia, exposicion = problem.score_components(configuration)
+    return cobertura - redundancia - exposicion
 
 
 def hill_climbing(
@@ -34,12 +35,48 @@ def hill_climbing(
     Tips:
     - problem.neighbors(current) retorna vecinos válidos en el orden que debe
       usarse para desempatar.
-    - Cada llamada a configuration_score(...) cuenta como una evaluación.
     - Inicialice los historiales con la configuración inicial y agregue solo las
       mejoras aceptadas antes de retornar el OptimizationResult.
     """
-    # TODO: Add your code here
-    raise NotImplementedError("Punto 1: implemente hill_climbing")
+    current = initial_configuration
+    current_score = configuration_score(problem, current)
+
+    evaluations = 1
+    iterations = 0
+
+    history = [current]
+    score_history = [current_score]
+
+    while iterations < max_iterations:
+        neighbors = problem.neighbors(current)
+
+        best_neighbor = None
+        best_neighbor_score = None
+        for neighbor in neighbors:
+            score = configuration_score(problem, neighbor)
+            evaluations += 1
+            if best_neighbor_score is None or score > best_neighbor_score:
+                best_neighbor = neighbor
+                best_neighbor_score = score
+
+        if best_neighbor is None or best_neighbor_score <= current_score:
+            break
+
+        current = best_neighbor
+        current_score = best_neighbor_score
+        iterations += 1
+
+        history.append(current)
+        score_history.append(current_score)
+
+    return OptimizationResult(
+        best_configuration=current,
+        best_score=current_score,
+        evaluations=evaluations,
+        iterations=iterations,
+        history=history,
+        score_history=score_history,
+    )
 
 
 def cooling_schedule(initial_temperature: float, cooling_rate: float, iteration: int) -> float:
