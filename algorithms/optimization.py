@@ -115,8 +115,53 @@ def simulated_annealing(
     rng = rng or random.Random()
     minimum_temperature = 1e-9
 
-    # TODO: Add your code here
-    raise NotImplementedError("Punto 2: implemente simulated_annealing")
+    current = initial_configuration
+    best = current 
+    t = 0
+    evaluations = 0
+
+    current_score = configuration_score(problem, current)
+    best_score = current_score 
+
+    temp = cooling_schedule(initial_temperature, cooling_rate, t )
+    history = [current]
+    score_history = [current_score]
+
+    while temp > minimum_temperature and t < max_iterations: 
+        vecino = rng.choice(problem.neighbors(current))
+        vecino_score = configuration_score(problem, vecino)
+        evaluations += 1
+        delta = vecino_score - current_score
+        if delta > 0: 
+            current = vecino
+            current_score = vecino_score
+
+        else: 
+            if rng.random() < math.exp(delta/temp): 
+                current = vecino
+                current_score = vecino_score
+        
+        if current_score > best_score: 
+            best = current 
+            best_score = current_score
+
+        score_history.append(current_score)
+        history.append (current)
+        
+        t += 1 
+        temp = cooling_schedule (initial_temperature, cooling_rate, t)
+
+    
+
+    return OptimizationResult (
+        best_configuration = best, 
+        best_score = best_score,
+        evaluations = evaluations,
+        iterations = t,
+        history = history, 
+        score_history = score_history
+    )
+
 
 
 def one_point_crossover(
