@@ -206,8 +206,23 @@ def swap_mutation(
     - Si alguno de los dos grupos está vacío, no hay un intercambio posible.
     - Retorne una tupla nueva; no modifique el individuo recibido.
     """
-    # TODO: Add your code here
-    raise NotImplementedError("Punto 3: implemente swap_mutation")
+    if rng.random() >= mutation_probability: 
+        return individual
+
+    activos = [i for i, bit in enumerate(individual) if bit == 1]
+    inactivos = [i for i, bit in enumerate(individual) if bit == 0]
+
+    if activos == [] or inactivos == []: 
+        return individual
+    
+    posicion_activa = rng.choice(activos)
+    posicion_inactiva =  rng.choice(inactivos)
+
+    nueva = list(individual)
+    nueva[posicion_activa] = 0
+    nueva[posicion_inactiva] = 1 
+          
+    return tuple(nueva)
 
 
 def genetic_algorithm(
