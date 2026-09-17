@@ -182,8 +182,12 @@ def one_point_crossover(
     if len(parent1) < 2:
         return parent1, parent2
 
-    # TODO: Add your code here
-    raise NotImplementedError("Punto 3: implemente one_point_crossover")
+    rango_corte = rng.randint(1, len(parent1)-1)
+
+    son = parent1[:rango_corte] + parent2[rango_corte:]
+    daughter = parent2[:rango_corte] + parent1[rango_corte:]
+
+    return son, daughter
 
 
 def swap_mutation(
