@@ -40,8 +40,31 @@ class MinimaxAgent(MultiAgentSearchAgent):
         - Reinicie las métricas y cuente una vez cada estado procesado, incluida
           la raíz. Retorne la acción de MAX y conserve la primera en los empates.
         """
-        # TODO: Add your code here
-        raise NotImplementedError("Punto 4: implemente MinimaxAgent.get_action")
+        
+        self.nodes_evaluated = 0
+        
+        eval_func = evaluation_function(state) #0.0
+        print(eval_func)
+        
+        agent_index = state.defender_position.index #<built-in method index of tuple object at 0x109f2fc00>
+        print(f"Agent index {agent_index}") 
+        
+        defender_pos = state.defender_position #(4, 7)
+        print(f"defender pos: {defender_pos}")
+        
+        succesor = state.generate_successor(0,"North") #GameState (state)
+        print(f"sucesor: {succesor}")
+        
+        legal_acts = state.get_legal_actions(0) #['North', 'South', 'Stop']
+        print(f"legal acts: {legal_acts}")
+        
+        num_agents = state.get_num_agents() #2
+        print(f"Num agents: {num_agents}")
+        
+        score = state.get_score() #0.0
+        print(f"score: {score}")
+        
+        
 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):

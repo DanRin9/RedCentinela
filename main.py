@@ -3,6 +3,7 @@ from pathlib import Path
 import statistics
 import sys
 
+
 from optimization.problem import SmartGridOptimizationProblem
 from optimization.runner import run_optimization
 from view.display import NullDisplay
