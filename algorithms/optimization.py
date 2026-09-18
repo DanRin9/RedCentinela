@@ -146,20 +146,18 @@ def simulated_annealing(
             best_score = current_score
 
         score_history.append(current_score)
-        history.append (current)
-        
-        t += 1 
-        temp = cooling_schedule (initial_temperature, cooling_rate, t)
+        history.append(current)
 
-    
+        t += 1
+        temp = cooling_schedule(initial_temperature, cooling_rate, t)
 
-    return OptimizationResult (
-        best_configuration = best, 
-        best_score = best_score,
-        evaluations = evaluations,
-        iterations = t,
-        history = history, 
-        score_history = score_history
+    return OptimizationResult(
+        best_configuration=best,
+        best_score=best_score,
+        evaluations=evaluations,
+        iterations=t,
+        history=history,
+        score_history=score_history,
     )
 
 
@@ -260,43 +258,43 @@ def genetic_algorithm(
     if not 0 <= elite_size <= population_size:
         raise ValueError("elite_size debe estar entre 0 y population_size")
 
-    poblacion = problem.initial_population(population_size,rng)
-    evaluaciones = 0 
-    
+    poblacion = problem.initial_population(population_size, rng)
+    evaluaciones = 0
+
     scores = [configuration_score(problem, ind) for ind in poblacion]
     evaluaciones += len(poblacion)
 
-    mejor_indice = max (range(len (scores)), key= lambda x: scores [x])
+    mejor_indice = max(range(len(scores)), key=lambda x: scores[x])
 
     best_global = poblacion[mejor_indice]
     best_score_global = scores[mejor_indice]
 
     history = [best_global]
-    score_history = [best_score_global] 
+    score_history = [best_score_global]
 
-    for i in range(generations):
+    for _ in range(generations):
         nueva_poblacion = []
-        ordenar_poblacion = sorted(poblacion,key = lambda ind: configuration_score(problem, ind), reverse=True)
+        ordenar_poblacion = sorted(poblacion, key=lambda ind: configuration_score(problem, ind), reverse=True)
         primeros_mejores = ordenar_poblacion[:elite_size]
 
         for m in primeros_mejores:
-             nueva_poblacion.append(m) 
+            nueva_poblacion.append(m)
 
-        while len(nueva_poblacion) < population_size: 
-            padre1 = problem.tournament_select (poblacion, scores, rng)
-            padre2 = problem.tournament_select (poblacion, scores, rng)
-            hijo1,hijo2 = one_point_crossover(padre1, padre2,rng)
+        while len(nueva_poblacion) < population_size:
+            padre1 = problem.tournament_select(poblacion, scores, rng)
+            padre2 = problem.tournament_select(poblacion, scores, rng)
+            hijo1, hijo2 = one_point_crossover(padre1, padre2, rng)
             hijo1 = problem.repair_configuration(hijo1, rng)
             hijo2 = problem.repair_configuration(hijo2, rng)
             hijo1 = swap_mutation(hijo1, mutation_probability, rng)
             hijo2 = swap_mutation(hijo2, mutation_probability, rng)
-            
+
             espacio_libre = population_size - len(nueva_poblacion)
 
-            if espacio_libre >= 2: 
-                nueva_poblacion.append(hijo1) 
+            if espacio_libre >= 2:
+                nueva_poblacion.append(hijo1)
                 nueva_poblacion.append(hijo2)
-            else: 
+            else:
                 nueva_poblacion.append(hijo1)
 
         poblacion = nueva_poblacion
