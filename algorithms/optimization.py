@@ -249,6 +249,8 @@ def genetic_algorithm(
       el mejor global de cada generación.
     """
     rng = rng or random.Random()
+
+
     if population_size < 2:
         raise ValueError("La población debe tener al menos dos individuos")
     if generations < 0:
@@ -258,5 +260,64 @@ def genetic_algorithm(
     if not 0 <= elite_size <= population_size:
         raise ValueError("elite_size debe estar entre 0 y population_size")
 
-    # TODO: Add your code here
-    raise NotImplementedError("Punto 3: implemente genetic_algorithm")
+    poblacion = problem.initial_population(population_size,rng)
+    evaluaciones = 0 
+    
+    scores = [configuration_score(problem, ind) for ind in poblacion]
+    evaluaciones += len(poblacion)
+
+    mejor_indice = max (range(len (scores)), key= lambda x: scores [x])
+
+    best_global = poblacion[mejor_indice]
+    best_score_global = scores[mejor_indice]
+
+    history = [best_global]
+    score_history = [best_score_global] 
+
+    for i in range(generations):
+        nueva_poblacion = []
+        ordenar_poblacion = sorted(poblacion,key = lambda ind: configuration_score(problem, ind), reverse=True)
+        primeros_mejores = ordenar_poblacion[:elite_size]
+
+        for m in primeros_mejores:
+             nueva_poblacion.append(m) 
+
+        while len(nueva_poblacion) < population_size: 
+            padre1 = problem.tournament_select (poblacion, scores, rng)
+            padre2 = problem.tournament_select (poblacion, scores, rng)
+            hijo1,hijo2 = one_point_crossover(padre1, padre2,rng)
+            hijo1 = problem.repair_configuration(hijo1, rng)
+            hijo2 = problem.repair_configuration(hijo2, rng)
+            hijo1 = swap_mutation(hijo1, mutation_probability, rng)
+            hijo2 = swap_mutation(hijo2, mutation_probability, rng)
+            
+            espacio_libre = population_size - len(nueva_poblacion)
+
+            if espacio_libre >= 2: 
+                nueva_poblacion.append(hijo1) 
+                nueva_poblacion.append(hijo2)
+            else: 
+                nueva_poblacion.append(hijo1)
+
+        poblacion = nueva_poblacion
+        scores = [configuration_score(problem, ind) for ind in poblacion]
+        evaluaciones += len(poblacion)
+
+        idx = max(range(len(scores)), key=lambda j: scores[j])
+        if scores[idx] > best_score_global:
+            best_global = poblacion[idx]
+            best_score_global = scores[idx]
+
+        history.append(best_global)
+        score_history.append(best_score_global)
+
+    return OptimizationResult(
+        best_configuration=best_global,
+        best_score=best_score_global,
+        evaluations=evaluaciones,
+        iterations=generations,
+        history=history,
+        score_history=score_history,
+    )
+
+
