@@ -97,35 +97,79 @@ class MinimaxAgent(MultiAgentSearchAgent):
         return estados[pos]
           
           
-          
-        
-          
-          
-        
-        
-        
-        
-  
-        
-        
-
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """Agente Minimax que evita explorar ramas mediante poda alfa-beta."""
+    def yepa (self, depth):
+        self.depth = depth
+        self.nodes_evaluated = 0
 
     def get_action(self, state: GameState) -> str | None:
-        """
-        Retorna la acción de Minimax aplicando poda alfa-beta.
+            """
+            Retorna la acción de Minimax aplicando poda alfa-beta.
+    
+            Debe usar la misma profundidad, orden de acciones y función de
+            evaluación que Minimax.
+    
+            Tips:
+            - Conserve la misma estructura y casos base de MinimaxAgent.
+            - Inicie alpha en -infinito y beta en +infinito, y páselos en las
+              llamadas recursivas.
+            - En MAX actualice alpha y corte si valor >= beta; en MIN actualice beta
+              y corte si valor <= alpha.
+            """
 
-        Debe usar la misma profundidad, orden de acciones y función de
-        evaluación que Minimax.
+            self.nodes_evaluated = 0
 
-        Tips:
-        - Conserve la misma estructura y casos base de MinimaxAgent.
-        - Inicie alpha en -infinito y beta en +infinito, y páselos en las
-          llamadas recursivas.
-        - En MAX actualice alpha y corte si valor >= beta; en MIN actualice beta
-          y corte si valor <= alpha.
-        """
-        # TODO: Add your code here
-        raise NotImplementedError("Punto 5: implemente AlphaBetaAgent.get_action")
+            mejor_accion = self.alphabeta(state=state, agent_index=0,depth_left=self.depth, alpha=float("-inf"), beta=float("inf"))
+
+            return mejor_accion
+
+    def alphabeta(self, state: GameState, agent_index, depth_left, alpha, beta):
+        self.nodes_evaluated += 1
+
+        if state.is_win() or state.is_lose() or depth_left == 0:
+            return evaluation_function(state), None
+
+        acciones = state.get_legal_actions(agent_index)
+
+        if not acciones:
+            return evaluation_function(state), None
+
+        num_agents = state.get_num_agents()
+        next_agent = (agent_index + 1) % num_agents
+        next_depth = depth_left - 1
+
+        if agent_index == 0: 
+            mejor_valor = float("-inf")
+            for accion in acciones:
+                sucesor = state.generate_successor(agent_index, accion)
+                valor, _ = self.alphabeta(sucesor, next_agent, next_depth, alpha, beta)
+
+                if valor > mejor_valor:
+                    mejor_valor = valor
+                    mejor_accion = accion
+
+                alpha = max(alpha, mejor_valor)
+
+                if mejor_valor >= beta:
+                    break
+                
+            return mejor_valor, mejor_accion
+
+        else:
+            mejor_valor = float("inf")
+            for accion in acciones:
+                sucesor = state.generate_successor(agent_index, accion)
+                valor, _ = self.alphabeta(sucesor, next_agent, next_depth, alpha, beta)
+
+                if valor < mejor_valor:
+                    mejor_valor = valor
+                    mejor_accion = accion
+
+                beta = min(beta, mejor_valor)
+
+                if mejor_valor <= alpha:
+                    break
+                
+            return mejor_valor, mejor_accion
