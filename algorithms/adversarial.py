@@ -16,6 +16,10 @@ class MultiAgentSearchAgent(ABC):
     @abstractmethod
     def get_action(self, state: GameState) -> str | None:
         raise NotImplementedError
+      
+    @abstractmethod
+    def recursiva(self, state: GameState):
+      raise NotImplementedError
 
 
 class MinimaxAgent(MultiAgentSearchAgent):
@@ -41,7 +45,9 @@ class MinimaxAgent(MultiAgentSearchAgent):
           la raíz. Retorne la acción de MAX y conserve la primera en los empates.
         """
         
-        self.nodes_evaluated = 0
+        
+        
+        mejor_camino = ["", -1001] #camino, score
         
         eval_func = evaluation_function(state) #0.0
         print(eval_func)
@@ -52,8 +58,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         defender_pos = state.defender_position #(4, 7)
         print(f"defender pos: {defender_pos}")
         
-        succesor = state.generate_successor(0,"North") #GameState (state)
-        print(f"sucesor: {succesor}")
+     
         
         legal_acts = state.get_legal_actions(0) #['North', 'South', 'Stop']
         print(f"legal acts: {legal_acts}")
@@ -63,6 +68,73 @@ class MinimaxAgent(MultiAgentSearchAgent):
         
         score = state.get_score() #0.0
         print(f"score: {score}")
+        
+        for act in legal_acts:
+          
+          nodo_n = self.recursiva(state, act, 0, self.depth)
+          score_nodo = evaluation_function(nodo_n)
+          
+          if score_nodo > mejor_camino[1]:
+            mejor_camino[0] = act
+            mejor_camino[1] = score_nodo
+            
+        return mejor_camino[0]
+      
+        
+        
+      
+    
+    def recursiva(self, state: GameState, accion: str, agent_i: int, depth: int) -> GameState: #por que debo pasarle la depth??
+
+        if state.is_win() or state.is_lose() or depth == 0:
+          return state
+        
+        
+        
+        self.nodes_evaluated += 1
+        next_agent = (agent_i + 1) % state.get_num_agents()
+        
+        state2 = state.generate_successor(next_agent, accion)
+        
+        estados = []
+        scores = []
+         
+        acciones = state2.get_legal_actions(next_agent)
+        
+        
+        
+        
+        #recursivo
+        for act in acciones:
+          
+          estado = self.recursiva(state2,act,next_agent,depth-1)
+          score = evaluation_function(estado)
+          
+          estados.append(estado)
+          scores.append(score)
+          
+        if agent_i == 1:
+          score_minimo = min(scores)
+          pos = scores.index(score_minimo) #primera aparicion
+          
+        else:
+          score_max = max(scores)
+          pos = scores.index(score_max) #priemra 
+          
+        
+          
+        return estados[pos]
+          
+          
+          
+        
+          
+          
+        
+        
+        
+        
+  
         
         
 
