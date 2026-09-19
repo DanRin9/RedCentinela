@@ -17,9 +17,7 @@ class MultiAgentSearchAgent(ABC):
     def get_action(self, state: GameState) -> str | None:
         raise NotImplementedError
       
-    @abstractmethod
-    def recursiva(self, state: GameState):
-      raise NotImplementedError
+  
 
 
 class MinimaxAgent(MultiAgentSearchAgent):
